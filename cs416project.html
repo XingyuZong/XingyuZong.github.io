@@ -1,0 +1,548 @@
+<!doctype html>
+<html>
+<head>
+<title>US COVID 19</title>
+<meta charset="utf-8">
+<script src="https://d3js.org/d3.v7.min.js""></script>
+<script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js "></script>
+</head>
+<style> circle {fill: lightblue; stroke: black;}</style>
+<body onload='init()'>
+<h1>Changes in American State's Incident Rates, Case Fatality Ratios, and Full Vaccination Rates of COVID-19 in 2021</h1>
+<label for='quarter'>Please select a quarter in 2021: (1) Q1 2021 (2) Q2 2021 (3) Q3 2021 (4) Q4 2021</label>
+<input type='range' min=1 max=4 step=1 id='quarter' value=1 oninput='selected_quarter.value = quarter.value'>
+<output name='selected_quarter' id='selected_quarter'>1</output>
+<div id='note' style='width:400px; height: 30px;'>
+<h4>Legend</h4>
+<p> Each circle on the scatter plot represents a state's quarterly full vaccination rate, 
+    and the circle will become bigger with the increase of the rate. </p>
+</div>
+<svg width=1200 height=1000> </svg>
+<script>
+async function init(){
+const data = await d3.csv("https://raw.githubusercontent.com/XingyuZong/XingyuZong.github.io/main/US_COVID_Data.csv ");
+var y = d3.scaleLinear().domain([0,4]).range([700,0]),
+x = d3.scaleLinear().domain([200,6000]).range([0,1000]);
+d3.selectAll('svg').attr('transform','translate(400,0)');
+plotQ1();
+
+function draw(quarter){
+ if (quarter == 1) {plotQ1();}
+ else if (quarter == 2) {plotQ2();}
+ else if (quarter == 3) {plotQ3();}
+ else {plotQ4();}; }
+function plotQ1(){
+ d3.select('svg').html(" ");
+ d3.select('svg').append('g').attr('transform', 'translate( '+ 50 + ','+ 50 +')').call(d3.axisLeft(y)).append('text')
+  .attr('y', -20)
+  .attr('x', 120)
+  .attr('text-anchor', 'end')
+  .attr('font-size', '11px')
+  .attr('stroke', 'black')
+  .text("Quarterly Case Fatality Ratio (%) ");
+ d3.select('svg').append('g').attr('transform', 'translate( '+ 50 + ','+ 750 +')').call(d3.axisBottom(x)).append('text')
+  .attr('y', -20)
+  .attr('x', 1100)
+  .attr('text-anchor', 'end')
+  .attr('font-size', '11px')
+  .attr('stroke', 'black')
+  .text("Quarterly Incident Rate (cases per 100000 persons) ");
+ const annotation_Q1_1 = [
+   {
+     note: {
+         label: "In Q1 2021, nearly half of the American states had quarterly case fatality ratios of covid-19 that were higher than 2% which is very high. ",
+         title: "High Quarterly Case Fatality Ratios " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+	color: ['grey'],
+    x: 50,
+    y: 400,
+    dy: -100,
+    dx: 60
+   }
+ ];
+ const makeAnnotation_Q1_1 = d3.annotation().annotations(annotation_Q1_1);
+ const annotation_Q1_2 = [
+   {
+     note: {
+         label: "In Q1 2021, nearly half of the American states had quarterly incident rates of covid-19 that were higher than 3000 cases per 100000 persons which is very high. ",
+         title: "High Quarterly Incident Rates " ,
+		 wrap: 200,
+         padding: 10		 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+	color: ['grey'],
+    x: 533,
+    y: 750,
+    dy: -20,
+    dx: 100
+   }
+ ];
+ const makeAnnotation_Q1_2 = d3.annotation().annotations(annotation_Q1_2);
+ const annotation_Q1_3 = [
+   {
+     note: {
+         label: "In Q1 2021, Alabama is the state that had the highest quarterly case fatality ratio of covid-19. ",
+         title: "Highest Quarterly Case Fatality Ratio " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    color: ['grey'],
+    x: 550,
+    y: 85,
+    dy: 40,
+    dx: 60
+   }
+ ];
+ const makeAnnotation_Q1_3 = d3.annotation().annotations(annotation_Q1_3);
+ const annotation_Q1_4 = [
+   {
+     note: {
+         label: "In Q1 2021, South Carolina is the state that had the highest quarterly incident rate of covid-19. ",
+         title: "Highest Quarterly Incident Rate " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+	color: ['grey'],
+    x: 833,
+    y: 474,
+    dy: -100,
+    dx: 60
+   }
+ ];
+ const makeAnnotation_Q1_4 = d3.annotation().annotations(annotation_Q1_4);
+ d3.select('svg').append('g').attr('transform','translate( '+ 50 + ','+ 50 +')').selectAll('circle').data(data).enter().append('circle').attr('cx', function(d,i) {return x(d.Q1_Incident_Rate * 100000);})
+ .attr('cy', function(d,i) {return y(d.Q1_Case_Fatality_Ratio * 100);})
+ .attr('r', function(d,i) {return d.Q1_Full_Vaccination_Rate * 100;})
+ .on('mouseover', function (event, datum) {
+      const[a, b] = d3.pointer(event);
+      d3.select('svg').append('text')
+        .attr('id', 'tooltip')
+        .attr('x', (a) + 160)
+        .attr('y', (b) + 20)
+        .attr('text-anchor', 'middle')
+		.attr('font-family', 'sans-setif')
+        .attr('font-size', '12px')
+		.attr('font-weight', 'bold')
+        .attr('fill', 'red')
+        .text(datum.Province_State + " "+ "Quarterly Full Vaccination Rate: " + (datum.Q1_Full_Vaccination_Rate *100).toFixed(4) + "% ");} )
+ .on('mouseout',function(d,i){
+     d3.select('#tooltip').remove();});
+ d3.select('svg').append('g').call(makeAnnotation_Q1_1);
+ d3.select('svg').append('g').call(makeAnnotation_Q1_2);
+ d3.select('svg').append('g').call(makeAnnotation_Q1_3);
+ d3.select('svg').append('g').call(makeAnnotation_Q1_4);
+ }
+ 
+ function plotQ2(){
+ d3.select('svg').html(" ");
+ var y2 = d3.scaleLinear().domain([0,4]).range([700,0]),
+ x2 = d3.scaleLinear().domain([200,3000]).range([0,1000]);
+ d3.select('svg').append('g').attr('transform', 'translate( '+ 50 + ','+ 50 +')').call(d3.axisLeft(y2)).append('text')
+  .attr('y', -20)
+  .attr('x', 120)
+  .attr('text-anchor', 'end')
+  .attr('font-size', '11px')
+  .attr('stroke', 'black')
+  .text("Quarterly Case Fatality Ratio (%) ");
+ d3.select('svg').append('g').attr('transform', 'translate( '+ 50 + ','+ 750 +')').call(d3.axisBottom(x2)).append('text')
+  .attr('y', -20)
+  .attr('x', 1100)
+  .attr('text-anchor', 'end')
+  .attr('font-size', '11px')
+  .attr('stroke', 'black')
+  .text("Quarterly Incident Rate (cases per 100000 persons) ");
+ const annotation_Q2_1 = [
+   {
+     note: {
+         label: "Many individuals got fully vaccinated in Q2 2021, and vaccines like Pfizer and Moderna did have effects on helping people fighting against covid-19; therefore, only 9 states had quarterly case fatality ratios of covid-19 that were higher than 2% in Q2 2021, indicating that most of states' quarterly case fatality ratios decreased. ",
+         title: "Quarterly Case Fatality Ratios Decreased " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    x: 50,
+    y: 400,
+    dy: 0,
+    dx: 600
+   }
+ ];
+ const makeAnnotation_Q2_1 = d3.annotation().annotations(annotation_Q2_1);
+ const annotation_Q2_2 = [
+   {
+     note: {
+         label: "Due to vaccines like Pfizer and Moderna did have effects on protecting people from being infected with covid-19, all states except Michigan had quarterly incident rates of covid-19 that were less than 1800 cases per 100000 persons in Q2 2021, indicating that most of states' quarterly incident rates decreased. ",
+         title: "Quarterly Incident Rates Decreased " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    x: 622,
+    y: 750,
+    dy: -40,
+    dx: 280
+   }
+ ];
+ const makeAnnotation_Q2_2 = d3.annotation().annotations(annotation_Q2_2);
+ const annotation_Q2_3 = [
+   {
+     note: {
+         label: "In Q2 2021, Georgia is the state that had the highest quarterly case fatality ratio of covid-19. ",
+         title: "Highest Quarterly Case Fatality Ratio " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    x: 230,
+    y: 195,
+    dy: -40,
+    dx: 60
+   }
+ ];
+ const makeAnnotation_Q2_3 = d3.annotation().annotations(annotation_Q2_3);
+ const annotation_Q2_4 = [
+   {
+     note: {
+         label: "In Q2 2021, Michigan is the state that had the highest quarterly incident rate of covid-19. ",
+         title: "Highest Quarterly Incident Rate " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    x: 850,
+    y: 470,
+    dy: -160,
+    dx: 60
+   }
+ ];
+ const makeAnnotation_Q2_4 = d3.annotation().annotations(annotation_Q2_4);
+ const annotation_Q2_5 = [
+   {
+     note: {
+         label: "Due to policies announced in March 2021 like allowing fully vaccinated people to gather indoors without masks, many individuals were encouraged to get fully vaccinated in Q2 2021. ",
+         title: "Quarterly Full Vaccination Rates Increased  " ,
+         wrap: 200,
+		 padding: 10 },
+	 type: d3.annotationCalloutRect,
+     subject: {
+      width: 200,
+      height: 200
+    },
+	connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    x: 350,
+    y: 510,
+    dy: -150,
+    dx: 180
+   }
+ ];
+ const makeAnnotation_Q2_5 = d3.annotation().annotations(annotation_Q2_5);
+ d3.select('svg').append('g').attr('transform','translate( '+ 50 + ','+ 50 +')').selectAll('circle').data(data).enter().append('circle').attr('cx', function(d,i) {return x2(d.Q2_Incident_Rate * 100000);})
+ .attr('cy', function(d,i) {return y2(d.Q2_Case_Fatality_Ratio * 100);})
+ .attr('r', function(d,i) {return d.Q2_Full_Vaccination_Rate * 100;})
+ .on('mouseover', function (event, datum) {
+      const[a, b] = d3.pointer(event);
+      d3.select('svg').append('text')
+        .attr('id', 'tooltip')
+        .attr('x', (a) + 160)
+        .attr('y', (b) + 20)
+        .attr('text-anchor', 'middle')
+		.attr('font-family', 'sans-setif')
+        .attr('font-size', '12px')
+		.attr('font-weight', 'bold')
+        .attr('fill', 'red')
+        .text(datum.Province_State + " "+ "Quarterly Full Vaccination Rate: " + (datum.Q2_Full_Vaccination_Rate *100).toFixed(4) + "% ");} )
+ .on('mouseout',function(d,i){
+     d3.select('#tooltip').remove();});
+ d3.select('svg').append('g').call(makeAnnotation_Q2_1);
+ d3.select('svg').append('g').call(makeAnnotation_Q2_2);
+ d3.select('svg').append('g').call(makeAnnotation_Q2_3);
+ d3.select('svg').append('g').call(makeAnnotation_Q2_4);
+ d3.select('svg').append('g').call(makeAnnotation_Q2_5);
+ }
+ 
+ function plotQ3(){
+ d3.select('svg').html(" ");
+ d3.select('svg').append('g').attr('transform', 'translate( '+ 50 + ','+ 50 +')').call(d3.axisLeft(y)).append('text')
+  .attr('y', -20)
+  .attr('x', 120)
+  .attr('text-anchor', 'end')
+  .attr('font-size', '11px')
+  .attr('stroke', 'black')
+  .text("Quarterly Case Fatality Ratio (%) ");
+ d3.select('svg').append('g').attr('transform', 'translate( '+ 50 + ','+ 750 +')').call(d3.axisBottom(x)).append('text')
+  .attr('y', -20)
+  .attr('x', 1100)
+  .attr('text-anchor', 'end')
+  .attr('font-size', '11px')
+  .attr('stroke', 'black')
+  .text("Quarterly Incident Rate (cases per 100000 persons) ");
+ const annotation_Q3_1 = [
+   {
+     note: {
+         label: "Many individuals got fully vaccinated in Q2 2021, and vaccines like Pfizer and Moderna did have effects on helping people fighting against covid-19; therefore, all states' quarterly case fatality ratios of ovid-19 were less than 2% in Q3 2021, indicating that quarterly case fatality ratios decreased further. ",
+         title: "Quarterly Case Fatality Ratios Decreased Further " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    x: 50,
+    y: 400,
+    dy: -35,
+    dx: 40
+   }
+ ];
+ const makeAnnotation_Q3_1 = d3.annotation().annotations(annotation_Q3_1);
+ const annotation_Q3_2 = [
+   {
+     note: {
+         label: "Due to the Delta Variant, nearly forty percent of states had quarterly incident rates of covid-19 that were higher than 3000 case per 100000 persons in Q3 2021, indicating that many states' quarterly incident rates increased. ",
+         title: "Quarterly Incident Rates Increased " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    x: 533,
+    y: 750,
+    dy: -400,
+    dx: 0
+   }
+ ];
+ const makeAnnotation_Q3_2 = d3.annotation().annotations(annotation_Q3_2);
+ const annotation_Q3_3 = [
+   {
+     note: {
+         label: "In Q3 2021, Nevada is the state that had the highest quarterly case fatality ratio of covid-19. ",
+         title: "Highest Quarterly Case Fatality Ratio " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    x: 500,
+    y: 455,
+    dy: -20,
+    dx: -10
+   }
+ ];
+ const makeAnnotation_Q3_3 = d3.annotation().annotations(annotation_Q3_3);
+ const annotation_Q3_4 = [
+   {
+     note: {
+         label: "In Q3 2021, Alaska is the state that had the highest quarterly incident rate of covid-19. ",
+         title: "Highest Quarterly Incident Rate " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    x: 1020,
+    y: 675,
+    dy: -200,
+    dx: -10
+   }
+ ];
+ const makeAnnotation_Q3_4 = d3.annotation().annotations(annotation_Q3_4);
+ d3.select('svg').append('g').attr('transform','translate( '+ 50 + ','+ 50 +')').selectAll('circle').data(data).enter().append('circle').attr('cx', function(d,i) {return x(d.Q3_Incident_Rate * 100000);})
+ .attr('cy', function(d,i) {return y(d.Q3_Case_Fatality_Ratio * 100);})
+ .attr('r', function(d,i) {return d.Q3_Full_Vaccination_Rate * 100;})
+ .on('mouseover', function (event, datum) {
+      const[a, b] = d3.pointer(event);
+      d3.select('svg').append('text')
+        .attr('id', 'tooltip')
+        .attr('x', (a) + 160)
+        .attr('y', (b) + 20)
+        .attr('text-anchor', 'middle')
+		.attr('font-family', 'sans-setif')
+        .attr('font-size', '12px')
+		.attr('font-weight', 'bold')
+        .attr('fill', 'red')
+        .text(datum.Province_State + " "+ "Quarterly Full Vaccination Rate: " + (datum.Q3_Full_Vaccination_Rate *100).toFixed(4) + "% ");} )
+ .on('mouseout',function(d,i){
+     d3.select('#tooltip').remove();});
+ d3.select('svg').append('g').call(makeAnnotation_Q3_1);
+ d3.select('svg').append('g').call(makeAnnotation_Q3_2);
+ d3.select('svg').append('g').call(makeAnnotation_Q3_3);
+ d3.select('svg').append('g').call(makeAnnotation_Q3_4);
+ }
+ 
+ function plotQ4(){
+ d3.select('svg').html(" ");
+ d3.select('svg').append('g').attr('transform', 'translate( '+ 50 + ','+ 50 +')').call(d3.axisLeft(y)).append('text')
+  .attr('y', -20)
+  .attr('x', 120)
+  .attr('text-anchor', 'end')
+  .attr('font-size', '11px')
+  .attr('stroke', 'black')
+  .text("Quarterly Case Fatality Ratio (%) ");
+ d3.select('svg').append('g').attr('transform', 'translate( '+ 50 + ','+ 750 +')').call(d3.axisBottom(x)).append('text')
+  .attr('y', -20)
+  .attr('x', 1100)
+  .attr('text-anchor', 'end')
+  .attr('font-size', '11px')
+  .attr('stroke', 'black')
+  .text("Quarterly Incident Rate (cases per 100000 persons) ");
+ const annotation_Q4_1 = [
+   {
+     note: {
+         label: "The Delta Variant is more fatal than previous covid-19 virus, causing some states' quarterly case fatality ratios increased and became higher than 2% in Q4 2021. ",
+         title: "Quarterly Case Fatality Ratios Increased " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    x: 50,
+    y: 400,
+    dy: -100,
+    dx: 40
+   }
+ ];
+ const makeAnnotation_Q4_1 = d3.annotation().annotations(annotation_Q4_1);
+ const annotation_Q4_2 = [
+   {
+     note: {
+         label: "Due to the Delta Variant and the Omicron variant, over half of states had quarterly incident rates that were higher than 3000 cases per 100000 persons, indicating that many states' incident rates increased further. ",
+         title: "Quarterly Incident Rates Increased Further " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    x: 533,
+    y: 750,
+    dy: -400,
+    dx: 100
+   }
+ ];
+ const makeAnnotation_Q4_2 = d3.annotation().annotations(annotation_Q4_2);
+ const annotation_Q4_3 = [
+   {
+     note: {
+         label: "In Q4 2021, Oklahoma is the state that had the highest quarterly case fatality ratio of covid-19. ",
+         title: "Highest Quarterly Case Fatality Ratio " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    x: 425,
+    y: 100,
+    dy: 10,
+    dx: 10
+   }
+ ];
+ const makeAnnotation_Q4_3 = d3.annotation().annotations(annotation_Q4_3);
+ const annotation_Q4_4 = [
+   {
+     note: {
+         label: "In Q4 2021, New Hampshire is the state that had the highest quarterly incident rate of covid-19. ",
+         title: "Highest Quarterly Incident Rate " ,
+		 wrap: 200,
+		 padding: 10 },
+	 connector: {
+      end: 'arrow',        
+      type: 'line',  
+      points: 3,      
+      lineType : 'horizontal' },
+    x: 1004,
+    y: 648,
+    dy: -100,
+    dx: 40
+   }
+ ];
+ const makeAnnotation_Q4_4 = d3.annotation().annotations(annotation_Q4_4);
+ const annotation_Q4_5 = [
+   {
+     note: {
+         label: "In Q4 2021, most of people had had got fully vaccinated in previous two quarters.",
+         title: "Quarterly Full Vaccination Rates Decreased " },
+	 type: d3.annotationCalloutRect,
+     subject: {
+      width: 180,
+      height: 180
+    },
+    x: 320,
+    y: 430,
+    dy: 100,
+    dx: -80
+   }
+ ];
+ const makeAnnotation_Q4_5 = d3.annotation().annotations(annotation_Q4_5);
+ d3.select('svg').append('g').attr('transform','translate( '+ 50 + ','+ 50 +')').selectAll('circle').data(data).enter().append('circle').attr('cx', function(d,i) {return x(d.Q4_Incident_Rate * 100000);})
+ .attr('cy', function(d,i) {return y(d.Q4_Case_Fatality_Ratio * 100);})
+ .attr('r', function(d,i) {return d.Q4_Full_Vaccination_Rate * 100;})
+ .on('mouseover', function (event, datum) {
+      const[a, b] = d3.pointer(event);
+      d3.select('svg').append('text')
+        .attr('id', 'tooltip')
+        .attr('x', (a) + 100)
+        .attr('y', (b) + 20)
+        .attr('text-anchor', 'middle')
+		.attr('font-family', 'sans-setif')
+        .attr('font-size', '12px')
+		.attr('font-weight', 'bold')
+        .attr('fill', 'red')
+        .text(datum.Province_State + " "+ "Quarterly Full Vaccination Rate: " + (datum.Q1_Full_Vaccination_Rate *100).toFixed(4) + "% ");} )
+ .on('mouseout',function(d,i){
+     d3.select('#tooltip').remove();});
+ d3.select('svg').append('g').call(makeAnnotation_Q4_1);
+ d3.select('svg').append('g').call(makeAnnotation_Q4_2);
+ d3.select('svg').append('g').call(makeAnnotation_Q4_3);
+ d3.select('svg').append('g').call(makeAnnotation_Q4_4);
+ d3.select('svg').append('g').call(makeAnnotation_Q4_5);
+ }
+
+var slider = d3.select('#quarter');
+slider.on('change', function() {draw(this.value);})
+}
+</script>
+</body>
+</html>
